@@ -126,3 +126,8 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
 };
 
 //Extract data from CSV
+d3.csv("assets/data/data.csv").then(function(data, err) {
+    if (err) throw err;
+
+    console.log(data);
+})
