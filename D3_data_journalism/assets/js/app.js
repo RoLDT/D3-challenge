@@ -79,3 +79,50 @@ function renderCircles(circlesGroup, newXScale, chosenXAxis, newYScale, chosenYA
     
     return circlesGroup;
 };
+
+//Tooltip
+function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
+    var labelX;
+
+    if (chosenXAxis === "poverty") {
+        labelX = "Poverty in State (%)";
+    }
+    else if (chosenXAxis === "income") {
+        labelX = "Household Income in State";
+    }
+    else {
+        labelX = "Age";
+    }
+
+    var labelY;
+
+    if (chosenYAxis === "obesity") {
+        labelY = "Obesity in State (%)";
+    }
+    else if (chosenYAxis === "smokes") {
+        labelY = "Smoking in State (%)";
+    }
+    else {
+        labelY = "Healthcare in State (%)"
+    }
+
+    var toolTip = d3.tip()
+        .attr("class", "tooltip")
+        .offset([80,-60])
+        .html(function(d) {
+            return (`${d.state}<br>${labelX} ${d[chosenXAxis]}<br>${labelY} ${d[chosenYAxis]}`);
+        });
+    
+    circlesGroup.call(toolTip);
+
+    circlesGroup.on("mouseover", function(data) {
+        toolTip.show(data);
+    })
+        .on("mouseout", function(data, index){
+            toolTip.hide(data);
+        });
+    
+    return circlesGroup;
+};
+
+//Extract data from CSV
