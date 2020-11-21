@@ -92,7 +92,7 @@ function circleText(textGroup, newXScale, chosenXAxis, newYScale, chosenYAxis) {
 };
 
 //Tooltip
-function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup, textGroup) {
+function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
     var labelX;
 
     if (chosenXAxis === "poverty") {
@@ -296,16 +296,16 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
     labelsGroupY.selectAll("text")
         .on("click", function(){
             var value = d3.select(this).attr("value");
-            if(value !== chosenYAxis) {
+            if (value !== chosenYAxis){
                 chosenYAxis = value;
-
+                
                 yLinearScale = yScale(data, chosenYAxis);
                 yAxis = renderAxisY(yLinearScale, yAxis);
-                circlesGroup = renderCircles(circlesGroup, yLinearScale, chosenYAxis, xLinearScale, chosenXAxis);
+                circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis);
                 textGroup = circleText(textGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis);
                 circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
-                if (chosenYAxis === "obesity" ) {
+                if (chosenYAxis === "obesity") {
                     obesityLabel
                         .classed("active", true)
                         .classed("inactive", false);
@@ -338,7 +338,7 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
                         .classed("active", true)
                         .classed("inactive", false);
                 }
-            }
+            };
         });
         
 }).catch(function(error){
