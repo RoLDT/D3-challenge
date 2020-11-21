@@ -35,7 +35,6 @@ function xScale(data, chosenXAxis) {
         d3.max(data, d => d[chosenXAxis]) * 1.2
     ])
     .range([0,width]);
-
     return xLinearScale;
 };
 
@@ -93,7 +92,7 @@ function circleText(textGroup, newXScale, chosenXAxis, newYScale, chosenYAxis) {
 };
 
 //Tooltip
-function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
+function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup, textGroup) {
     var labelX;
 
     if (chosenXAxis === "poverty") {
@@ -167,9 +166,9 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
     chartGroup.append("g")
         .classed("y-axis", true)
         .call(leftAxis);
-    //ERROR IN CIRCLES; THEY MOVE OUT OF THE CHART
-    //Error in circles; dont have text in them
-    var circlesGroup = chartGroup.selectAll("circle")
+    //ERROR IN CIRCLES; THEY MOVE OUT OF THE CHART; FIXED
+    //Error in circles; dont have text in them; KINDAFIXED; FIXED = HAD TO CORRECTLY "selectAll" with ".stateCircle" and ".stateText"
+    var circlesGroup = chartGroup.selectAll(".stateCircle")
         .data(data)
         .enter()
         .append("circle")
@@ -178,7 +177,7 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
         .attr("r", 15)
         .classed("stateCircle", true);
 
-    var textGroup = chartGroup.selectAll("text")
+    var textGroup = chartGroup.selectAll(".stateText")
         .data(data)
         .enter()
         .append("text")
@@ -221,7 +220,7 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
     //YLabels
     var obesityLabel = labelsGroupY.append("text")
         .attr("x",0)
-        .attr("y", 0 -20)
+        .attr("y", 0 - 20)
         .attr("transform", "rotate(-90)")
         .attr("value", "obesity")
         .classed("active", true)
@@ -229,7 +228,7 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
 
     var smokesLabel = labelsGroupY.append("text")
         .attr("x",0)
-        .attr("y", 0-40)
+        .attr("y", 0 - 40)
         .attr("transform", "rotate(-90)")
         .attr("value", "smokes")
         .classed("inactive", true)
@@ -237,7 +236,7 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
 
     var healthcareLabel = labelsGroupY.append("text")
         .attr("x",0)
-        .attr("y", 0-60)
+        .attr("y", 0 - 60)
         .attr("transform", "rotate(-90)")
         .attr("value", "healthcare")
         .classed("inactive", true)
@@ -294,7 +293,7 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
             }
         });
         //ERROR IN CLICK; THE CHART DOES NOT CHANGE
-        labelsGroupY.selectAll("text")
+    labelsGroupY.selectAll("text")
         .on("click", function(){
             var value = d3.select(this).attr("value");
             if(value !== chosenYAxis) {
