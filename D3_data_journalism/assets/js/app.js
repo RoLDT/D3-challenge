@@ -16,6 +16,7 @@ var height = svgHeight - margin.top - margin.bottom;
 var svg = d3
     .select("#scatter")
     .append("svg")
+    .classed("chart", true)
     .attr("width", svgWidth)
     .attr("height", svgHeight);
 
@@ -30,8 +31,8 @@ var chosenYAxis = "obesity";
 //Update x-scale depending on label
 function xScale(data, chosenXAxis) {
     var xLinearScale = d3.scaleLinear()
-        .domain([d3.min(data, d => d[chosenXAxis]),
-        d3.max(data, d => d[chosenXAxis])
+        .domain([d3.min(data, d => d[chosenXAxis]) * 0.8,
+        d3.max(data, d => d[chosenXAxis]) * 1.2
     ])
     .range([0,width]);
 
@@ -51,8 +52,8 @@ function renderAxisX(newXScale, xAxis) {
 //Update y-scale depending on label
 function yScale(data, chosenYAxis) {
     var yLinearScale = d3.scaleLinear()
-        .domain([d3.min(data, d => d[chosenYAxis]),
-        d3.max(data, d => d[chosenYAxis])
+        .domain([d3.min(data, d => d[chosenYAxis]) * 0.8,
+        d3.max(data, d => d[chosenYAxis]) * 1.2
     ])
     .range([height,0]);
 
@@ -80,30 +81,41 @@ function renderCircles(circlesGroup, newXScale, chosenXAxis, newYScale, chosenYA
     return circlesGroup;
 };
 
+//Circle Labels
+function circleText(textGroup, newXScale, chosenXAxis, newYScale, chosenYAxis) {
+
+    textGroup.transition()
+        .duration(1000)
+        .attr("x", d => newXScale(d[chosenXAxis]))
+        .attr("y", d => newYScale(d[chosenYAxis]));
+    
+    return textGroup;
+};
+
 //Tooltip
 function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
     var labelX;
 
     if (chosenXAxis === "poverty") {
-        labelX = "Poverty in State (%)";
+        labelX = "Poverty in State (%):";
     }
     else if (chosenXAxis === "income") {
-        labelX = "Household Income in State";
+        labelX = "Household Income in State:";
     }
     else {
-        labelX = "Age";
+        labelX = "Age:";
     }
 
     var labelY;
 
     if (chosenYAxis === "obesity") {
-        labelY = "Obesity in State (%)";
+        labelY = "Obesity in State (%):";
     }
     else if (chosenYAxis === "smokes") {
-        labelY = "Smoking in State (%)";
+        labelY = "Smoking in State (%):";
     }
     else {
-        labelY = "Healthcare in State (%)"
+        labelY = "Healthcare in State (%):"
     }
 
     var toolTip = d3.tip()
@@ -153,6 +165,7 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
         .call(bottomAxis);
     
     chartGroup.append("g")
+        .classed("y-axis", true)
         .call(leftAxis);
     //ERROR IN CIRCLES; THEY MOVE OUT OF THE CHART
     //Error in circles; dont have text in them
@@ -164,13 +177,24 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
         .attr("cy", d => yLinearScale(d[chosenYAxis]))
         .attr("r", 15)
         .classed("stateCircle", true);
+
+    var textGroup = chartGroup.selectAll("text")
+        .data(data)
+        .enter()
+        .append("text")
+        .attr("x", d => xLinearScale(d[chosenXAxis]))
+        .attr("y", d => yLinearScale(d[chosenYAxis]))
+        .attr("text-anchor", "middle")
+        .attr("font-size", "10px")
+        .text(d => d.abbr)
+        .classed("stateText", true);
     
     
     var labelsGroupX = chartGroup.append("g")
-        .attr("transform", `translate(${width/2}, ${height + 20})`);
+        .attr("transform", `translate(${width/2}, ${height + 10})`);
     //ERROR IN YLABELS; THEY ARE ALL THE WAY TO THE RIGHT
     var labelsGroupY = chartGroup.append("g")
-        .attr("transform", `translate(${width + 20}, ${height/2})`);
+        .attr("transform", `translate(${0 - margin.left/4}, ${height/2})`);
     
     //XLabels
     var povertyLabel = labelsGroupX.append("text")
@@ -196,24 +220,24 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
 
     //YLabels
     var obesityLabel = labelsGroupY.append("text")
-        .attr("x",20 )
-        .attr("y", 0)
+        .attr("x",0)
+        .attr("y", 0 -20)
         .attr("transform", "rotate(-90)")
         .attr("value", "obesity")
         .classed("active", true)
         .text("Obesity in State (%)");
 
     var smokesLabel = labelsGroupY.append("text")
-        .attr("x",40)
-        .attr("y", 0)
+        .attr("x",0)
+        .attr("y", 0-40)
         .attr("transform", "rotate(-90)")
         .attr("value", "smokes")
         .classed("inactive", true)
         .text("Smoking in State (%)");
 
     var healthcareLabel = labelsGroupY.append("text")
-        .attr("x",60)
-        .attr("y", 0)
+        .attr("x",0)
+        .attr("y", 0-60)
         .attr("transform", "rotate(-90)")
         .attr("value", "healthcare")
         .classed("inactive", true)
@@ -230,8 +254,9 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
 
                 xLinearScale = xScale(data, chosenXAxis);
                 xAxis = renderAxisX(xLinearScale, xAxis);
-                circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis);
-                circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+                circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis);
+                textGroup = circleText(textGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis);
+                circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
                 if (chosenXAxis === "poverty" ) {
                     povertyLabel
@@ -277,8 +302,9 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
 
                 yLinearScale = yScale(data, chosenYAxis);
                 yAxis = renderAxisY(yLinearScale, yAxis);
-                circlesGroup = renderCircles(circlesGroup, yLinearScale, chosenYAxis);
-                circlesGroup = updateToolTip(chosenYAxis, circlesGroup);
+                circlesGroup = renderCircles(circlesGroup, yLinearScale, chosenYAxis, xLinearScale, chosenXAxis);
+                textGroup = circleText(textGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis);
+                circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
                 if (chosenYAxis === "obesity" ) {
                     obesityLabel
