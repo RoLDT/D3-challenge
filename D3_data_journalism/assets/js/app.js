@@ -191,7 +191,7 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
     
     var labelsGroupX = chartGroup.append("g")
         .attr("transform", `translate(${width/2}, ${height + 10})`);
-    //ERROR IN YLABELS; THEY ARE ALL THE WAY TO THE RIGHT
+    //ERROR IN YLABELS; THEY ARE ALL THE WAY TO THE RIGHT; FIXED = PLAYED WITH THE TRANSLATION
     var labelsGroupY = chartGroup.append("g")
         .attr("transform", `translate(${0 - margin.left/4}, ${height/2})`);
     
@@ -298,7 +298,7 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
             var value = d3.select(this).attr("value");
             if (value !== chosenYAxis){
                 chosenYAxis = value;
-                
+
                 yLinearScale = yScale(data, chosenYAxis);
                 yAxis = renderAxisY(yLinearScale, yAxis);
                 circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis);
