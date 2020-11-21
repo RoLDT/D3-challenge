@@ -162,10 +162,12 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
         .classed("x-axis", true)
         .attr("transform", `translate(0, ${height})`)
         .call(bottomAxis);
-    
-    chartGroup.append("g")
+        
+    //HERE WAS THE FIX TO THE YAXIS LABELS NOT WORKING; HAD TO CREATE THE "yAxis" VAR.
+    var yAxis = chartGroup.append("g")
         .classed("y-axis", true)
         .call(leftAxis);
+
     //ERROR IN CIRCLES; THEY MOVE OUT OF THE CHART; FIXED
     //Error in circles; dont have text in them; KINDAFIXED; FIXED = HAD TO CORRECTLY "selectAll" with ".stateCircle" and ".stateText"
     var circlesGroup = chartGroup.selectAll(".stateCircle")
