@@ -32,11 +32,15 @@ d3.csv("assets/data/data.csv").then(function(data) {
     });
     //Scales for the X and Y Axis'
     var xLinearScale = d3.scaleLinear()
-        .domain(d3.extent(data, d => d.poverty))
+        .domain([d3.min(data, d => d.poverty) * .9,
+        d3.max(data, d => d.poverty) * 1
+        ])
         .range([0,width]);
 
     var yLinearScale = d3.scaleLinear()
-        .domain(d3.extent(data, d => d.healthcare))
+        .domain([d3.min(data, d => d.healthcare) * .4,
+            d3.max(data, d => d.healthcare) * 1.1
+            ])
         .range([height,0]);
 
     var bottomAxis = d3.axisBottom(xLinearScale);
